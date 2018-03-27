@@ -8,5 +8,5 @@ IntBuffer allocateDirectIntBuffer(int n) {
 
 void showFrameRate() {
   String f="GPU Particles, fr:"+int((int(frameRate/4))*4);
-  frame.setTitle(f);
+  surface.setTitle(f);
 }

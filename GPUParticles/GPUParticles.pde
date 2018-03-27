@@ -11,7 +11,7 @@ import com.jogamp.opengl.GL2ES2;
 //   1, LINES
 //   2, TRIANGLES
 int MODE = 0;
-int nOfP = 1000;
+int nOfP = 10000;
 
 PShader shader;
 float angle;
@@ -79,7 +79,8 @@ void draw() {
   // have the right names.
   translate(width / 2, height / 2);
   rotateX(angle);
-  rotateY(angle * 2);
+  rotateY(0.2 * PI * cos(angle));
+  rotateZ(0.5 * PI * sin(angle));
   updateGeometry();
   glDraw();
 
@@ -133,9 +134,9 @@ void glDraw() {
 void initGeometry() {
   for (int i = 0; i < nOfP; i++) {
     int j = 4 * i;
-    positions[j] = random(-200, 200);
-    positions[j + 1] = random(-200, 200);
-    positions[j + 2] = random(-200, 200);
+    positions[j] = random(-300, 300);
+    positions[j + 1] = random(-300, 300);
+    positions[j + 2] = random(-300, 300);
     positions[j + 3] = 1;
     colors[j] = 1;
     colors[j + 1] = 1;
@@ -164,5 +165,9 @@ void keyPressed() {
     MODE = 1;
   } else if (key == '3') {
     MODE = 2;
+  }
+
+  if (key == ' ') {
+    initGeometry();
   }
 }
