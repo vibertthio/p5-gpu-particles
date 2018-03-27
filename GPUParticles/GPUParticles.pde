@@ -6,6 +6,13 @@ import java.nio.IntBuffer;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2ES2;
 
+// MODE:
+//   0, POINTS
+//   1, LINES
+//   2, TRIANGLES
+int MODE = 0;
+int nOfP = 1000;
+
 PShader shader;
 float angle;
 
@@ -13,11 +20,12 @@ float[] positions;
 float[] colors;
 int[] indices;
 
+// Buffers
 FloatBuffer posBuffer;
 FloatBuffer colorBuffer;
 IntBuffer indexBuffer;
 
-int nOfP = 1000;
+//
 int posVboId;
 int colorVboId;
 int indexVboId;
@@ -31,6 +39,7 @@ GL2ES2 gl;
 void setup() {
   size(800, 600, P3D);
 
+  // shaders initialization
   shader = loadShader("frag.glsl", "vert.glsl");
 
   positions = new float[nOfP * 4];
@@ -60,18 +69,24 @@ void setup() {
   endPGL();
   initGeometry();
 }
-
 void draw() {
   showFrameRate();
   background(0);
 
-  // Geometry transformations from Processing are automatically passed to the shader
-  // as long as the uniforms in the shader have the right names.
+  // Geometry transformations from Processing
+  // are automatically passed to the shader
+  // as long as the uniforms in the shader
+  // have the right names.
   translate(width / 2, height / 2);
   rotateX(angle);
   rotateY(angle * 2);
-
   updateGeometry();
+  glDraw();
+
+  angle += 0.01;
+}
+
+void glDraw() {
 
   pgl = (PJOGL) beginPGL();
   gl = pgl.gl.getGL2ES2();
@@ -94,9 +109,19 @@ void draw() {
   // Draw the triangle elements
   gl.glBindBuffer(PGL.ELEMENT_ARRAY_BUFFER, indexVboId);
   pgl.bufferData(PGL.ELEMENT_ARRAY_BUFFER, Integer.BYTES * indices.length, indexBuffer, GL.GL_DYNAMIC_DRAW);
-  // gl.glDrawElements(PGL.TRIANGLES, indices.length, GL.GL_UNSIGNED_INT, 0);
-  // gl.glDrawElements(PGL.POINTS, colors.length / 4, GL.GL_UNSIGNED_INT, 0);
-  gl.glDrawElements(PGL.LINES, colors.length / 4, GL.GL_UNSIGNED_INT, 0);
+  switch(MODE) {
+    case 0:
+      gl.glDrawElements(PGL.POINTS, colors.length / 4, GL.GL_UNSIGNED_INT, 0);
+      break;
+    case 1:
+      gl.glDrawElements(PGL.LINES, colors.length / 4, GL.GL_UNSIGNED_INT, 0);
+      break;
+    case 2:
+      gl.glDrawElements(PGL.TRIANGLES, indices.length, GL.GL_UNSIGNED_INT, 0);
+      break;
+    default:
+      break;
+  }
   gl.glBindBuffer(PGL.ELEMENT_ARRAY_BUFFER, 0);
 
   gl.glDisableVertexAttribArray(posLoc);
@@ -104,10 +129,7 @@ void draw() {
   shader.unbind();
 
   endPGL();
-
-  angle += 0.01;
 }
-
 void initGeometry() {
   for (int i = 0; i < nOfP; i++) {
     int j = 4 * i;
@@ -122,9 +144,7 @@ void initGeometry() {
     indices[i] = i;
   }
 }
-
 void updateGeometry() {
-
   posBuffer.rewind();
   posBuffer.put(positions);
   posBuffer.rewind();
@@ -136,4 +156,13 @@ void updateGeometry() {
   indexBuffer.rewind();
   indexBuffer.put(indices);
   indexBuffer.rewind();
+}
+void keyPressed() {
+  if (key == '1') {
+    MODE = 0;
+  } else if (key == '2') {
+    MODE = 1;
+  } else if (key == '3') {
+    MODE = 2;
+  }
 }
