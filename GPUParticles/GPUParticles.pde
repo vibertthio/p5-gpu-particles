@@ -73,21 +73,20 @@ void draw() {
   showFrameRate();
   background(0);
 
+  translate(width / 2, height / 2);
+  angle += 0.01;
+  // rotateX(angle);
+  // rotateY(0.2 * PI * cos(angle));
+  // rotateZ(0.5 * PI * sin(angle));
+  updateGeometry();
+  glDraw();
+}
+
+void glDraw() {
   // Geometry transformations from Processing
   // are automatically passed to the shader
   // as long as the uniforms in the shader
   // have the right names.
-  translate(width / 2, height / 2);
-  rotateX(angle);
-  rotateY(0.2 * PI * cos(angle));
-  rotateZ(0.5 * PI * sin(angle));
-  updateGeometry();
-  glDraw();
-
-  angle += 0.01;
-}
-
-void glDraw() {
 
   pgl = (PJOGL) beginPGL();
   gl = pgl.gl.getGL2ES2();
